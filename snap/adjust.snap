@@ -1,0 +1,150 @@
+title verlet
+
+!=============================================================
+! Data section
+!
+! Coordinate file containing station codes and trial coordinates
+! Specify either the coordinate file name for a SNAP format file, or 
+! filename csv [format=dtf_file_name] 
+! for CSV format files
+
+coordinate_file coords.crd
+
+! Data files, on per line. Each line uses one of the formats
+!   data_file filename 
+!   data_file filename csv [format=dtf_file_name ...]
+!   data_file filename sinex [code=SITE|POINT ref_frame=...]
+!
+! These can be follow by options
+!   error_factor ##.##    standard errors are multiplied by factor
+!   recode recode_file_name   Station codes are translated as the file is read
+
+data_file distances
+
+
+
+!==============================================================
+! Adjustment definition
+!
+! Define the mode of the adjustment 
+! [horizontal|vertical|3d] [data_check|network_analysis|adjustment]
+
+mode horizontal adjustment
+
+! Define which stations are held fixed in the adjustment, which are 
+! free (calculated), and which are floated (calculated with a priori 
+! coordinate errors).
+! 
+! Use the fix, float, and free commands to define these
+! Use the horizontal_float_error and vertical_float_error commands
+! to define the apriori error of floated stations
+!
+! Use reject, ignore, and accept commands to remove stations from
+! the adjustment 
+!
+! These commands all use "station lists".  Most simply this 
+! is a list of stations such as "BDE1 APRX ...", but it can also 
+! identify station by classification, geographic location, etc.
+! See the help for details of what can be used in station lists.  
+
+fix P1 P15 P29
+
+! Deformation model should be included for NZGD2000 adjustments.  
+! Set to "deformation none" for adjustments extending beyond NZ land area
+
+deformation none
+
+! Reference frame for ITRF2008 GNSS observations relative to ITRF96.  For this
+! to be used the reference frame must be specified as ITRF2008 in the data file
+! (or in the data_file command with ref_frame=ITRF2008 for SINEX format files)
+
+! reference_frame ITRF2008 IERS_ETSR 2000.0 -4.8 -2.09 17.67 -1.40901 0.16508 -0.26897 -0.11984 -0.79 0.6 1.34 0.10201 0.01347 -0.01514 -0.01973 
+
+! If the data include stations not in the coordinate file, these observations
+! can be ignored by uncommenting the following line.  Otherwise missing stations
+! will stop the adjustment
+
+! ignore_missing_stations
+
+! Selection and reweighting of observations 
+!
+! reweight_observations <selection_criteria>
+! reject_observations <selection_criteria>
+! ignore_observations <selection_criteria>
+!
+! Selection criteria can include 
+!     <classification>=<value>
+!     before <date>
+!     after <date>
+!     date_unknown
+!     using_stations ...
+!     between_staions ....
+
+! Additional adjustment parameters
+!
+! Any of the following additional parameters can be included
+!
+! reference_frame  (topocentric|geocentric)  [calculate] <code> (scale|rotation)  [value [?]]
+! refraction_coefficient [calculate] <code> [value [?]]
+! bearing_orientation_error  [calculate]  <code>  [value [?]]
+! distance_scale_error  [calculate]  <code>  [value [?]]
+! reference_frame_scale_error [calculate] [value [?]]
+! systematic_error [calculate] <code> [value [?]]
+ 
+
+!==============================================================
+! Adjustment control commands
+!
+! Maximum number of iterations.
+! Convergence tolerance in metres - adjustment stops when no station is 
+! adjusted more than this.
+! Maximum adjustment - adjustment fails if a station is moved more than
+! this
+
+max_iterations 5
+convergence_tolerance 0.0001
+max_adjustment 1000
+
+!==============================================================
+! Output options
+!
+!  The output all_relative_covariances is required for some statistical
+! analysis of the adjustment results, eg snapspec
+!
+! output all_relative_covariances
+
+! Listing file sections
+!
+
+! list command_file
+! list file_summary
+! list input_data
+! list problem_definition
+! list iteration_summary
+! list observation_equations
+! list station_adjustments
+! list solution_summary
+! list station_coordinates
+! list station_summary
+! list floated_stations
+! list residuals
+! list worst_residuals
+
+! Additional information in the residual listing section
+! Columns can be:
+! from to from_name to_name hgt_inst hgt_trgt type date file file_no line_no 
+! obs_val obs_err calc_val calc_err res_val res_err alt_res std_res redundancy mde_power
+! flags azimuth prj_azimuth hgt_diff arc_dist slp_dist 
+
+! add_residual_column column_name ...
+
+! Change the accumulations used in the error summaries
+!
+! Summary definition can include, "data_type", "data_file", or any observation
+! classifications.
+
+! summarize_errors_by summary_definition
+
+! Change the number of worst residuals listed at the in the worst residuals section
+
+! number_of_worst_residuals 
